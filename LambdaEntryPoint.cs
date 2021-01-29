@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Lambda.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 namespace AngularRestfulAPI
 {
     /// <summary>
@@ -27,6 +33,8 @@ namespace AngularRestfulAPI
 
         Amazon.Lambda.AspNetCoreServer.APIGatewayProxyFunction
     {
+ 
+
         /// <summary>
         /// The builder has configuration, logging and Amazon API Gateway already configured. The startup class
         /// needs to be configured in this method using the UseStartup<>() method.
@@ -47,6 +55,25 @@ namespace AngularRestfulAPI
         /// <param name="builder"></param>
         protected override void Init(IHostBuilder builder)
         {
+        }
+
+        public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext lambdaContext)
+        {
+            object obj = new { payload = new { data = new { Message = new { content = "Test Testing again", SentAt = DateTime.Now.ToString(), MessageFrom = new { Id = "1", DisplayName = "Test" } } } }, type = "data", id = "1" };
+            Console.WriteLine($"REquest {request.HttpMethod}");
+            var response = new APIGatewayProxyResponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Body = JsonConvert.SerializeObject(obj),
+                Headers = new Dictionary<string, string> {
+                    { "Content-Type", "application/json" }, 
+                    { "Access-Control-Allow-Origin","*"  }, 
+                    { "Access-Control-Allow-Methods","OPTIONS,POST,GET"}, 
+                    {"Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"}
+    }
+            };
+
+            return response;
         }
     }
 }

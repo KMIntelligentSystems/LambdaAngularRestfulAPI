@@ -1,0 +1,20 @@
+
+{
+    "region" : "us-east-1",
+    "configuration" : "Debug",
+    "framework"     : "netcoreapp3.1",
+    "self-contained" : false,
+    "application"    : "AngularRestfulAPI",
+    "environment"    : "AngularRestfulAPI-dev",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-fdaab798\";\"aws:ec2:vpc,Subnets\"=\"subnet-703e847c\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.1.1 running .NET Core",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "angularrestfulapi-dev",
+    "instance-type"        : "t1.micro",
+    "key-pair"             : "BitNamiHostingKey",
+    "instance-profile"     : "aws-elasticbeanstalk-ec2-role",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}

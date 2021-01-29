@@ -27,6 +27,16 @@ namespace AngularRestfulAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllHeaders",
+                      builder =>
+                      {
+                          builder.AllowAnyOrigin()
+                                 .AllowAnyHeader()
+                                 .AllowAnyMethod();
+                      });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -41,6 +51,8 @@ namespace AngularRestfulAPI
 
             app.UseRouting();
 
+            app.UseCors("AllowAllHeaders");
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -49,6 +61,11 @@ namespace AngularRestfulAPI
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+                });
+                endpoints.MapPost("/", async context =>
+                {
+                    Console.WriteLine($"Startup {context.Request}");
+                    //await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
                 });
             });
         }

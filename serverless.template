@@ -8,14 +8,14 @@
     "AspNetCoreFunction": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "Handler": "AngularRestfulAPI::AngularRestfulAPI.LambdaEntryPoint::FunctionHandlerAsync",
+        "Handler": "AngularRestfulAPI::AngularRestfulAPI.LambdaEntryPoint::FunctionHandler",
         "Runtime": "dotnetcore3.1",
         "CodeUri": "",
         "MemorySize": 256,
         "Timeout": 30,
         "Role": null,
-        "Policies": [
-          "AWSLambda_FullAccess"
+         "Policies": [
+          "AWSLambdaFullAccess"
         ],
         "Events": {
           "ProxyResource": {
@@ -33,6 +33,19 @@
             }
           }
         }
+      }
+    }, 
+   "GetMessagePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": [
+        
+      ],
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "AspNetCoreFunction"
+        },
+        "Principal": "sqs.amazonaws.com"
       }
     }
   },
