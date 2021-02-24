@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.Runtime;
+using Amazon.Runtime.SharedInterfaces;
+using Amazon.SQS;
+using Amazon.SQS.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -55,12 +61,47 @@ namespace AngularRestfulAPI
         /// <param name="builder"></param>
         protected override void Init(IHostBuilder builder)
         {
+            SQSClient = new AmazonSQSClient();
         }
-
-        public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext lambdaContext)
+        IAmazonSQS SQSClient { get; set; }
+        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext lambdaContext)
         {
-            object obj = new { payload = new { data = new { Message = new { content = "Test Testing again", SentAt = DateTime.Now.ToString(), MessageFrom = new { Id = "1", DisplayName = "Test" } } } }, type = "data", id = "1" };
-            Console.WriteLine($"REquest {request.HttpMethod}");
+            var awsCredentials = new BasicAWSCredentials("bbbbbbbbbbbbbbbbbbbb", "nnnnnnnnnnnnnnnnnnnn");
+            var region = RegionEndpoint.GetBySystemName("us-east-1");
+
+
+            
+            if (request.HttpMethod == "POST")
+            {
+                Console.WriteLine($"REquest {request.Body}");
+                using (var client = new AmazonLambdaClient(awsCredentials, region))
+                {
+                    var request_ = new Amazon.Lambda.Model.InvokeRequest
+                    {
+                        FunctionName = "HotchocolateService-GraphQLReceivedMutationFunctio-1OUT8F062N8X6",
+                        InvocationType = InvocationType.RequestResponse,
+                        LogType = LogType.Tail,
+                        Payload = JsonConvert.SerializeObject(request.Body)
+                    };
+
+                    var result = Task.Run(() => _ = client.InvokeAsync(request_));
+                      var res = result.GetAwaiter().GetResult();
+
+
+                }
+
+              /*  var sqsRequest = new SendMessageRequest
+                {
+                    QueueUrl = "https://sqs.us-east-1.amazonaws.com/280449388741/GraphQLDataQueue",
+                    MessageBody = request.Body
+                };
+
+                await SQSClient.SendMessageAsync(sqsRequest);*/
+            }
+            Console.WriteLine($"REquest {request.Body}");
+           
+
+            object obj = new { data = new { addMessage = new { Message = new { content = "Test Testing again", SentAt = DateTime.Now.ToString(), MessageFrom = new { Id = "1", DisplayName = "Test" } } } }, type = "data", id = "1" };
             var response = new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
